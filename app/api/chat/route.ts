@@ -29,12 +29,14 @@ async function handlePostRequest(req: NextRequest) {
 
     let model = process.env.OPENAI_API_MODEL as string,
       content = userMessage;
+      
     const response = await openai.chat.completions.create({
       model: model,
       messages: [{ role: 'user', content: content }],
       stream: true,
       max_tokens: 1024,
     });
+    
     return new Response(response.toReadableStream());
   } catch (error: any) {
     console.error('Error processing request: ', error);

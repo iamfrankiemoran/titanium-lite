@@ -4,14 +4,19 @@ import { useFormContext } from 'react-hook-form';
 import winkNLP from 'wink-nlp';
 import model from 'wink-eng-lite-web-model';
 import {
-  retrieveAIResponse
+  retrieveAIResponse,
+  retrieveTextFromSpeech
 } from '@/app/services/chatService';
 const nlp = winkNLP(model);
 
 export const useMessageProcessing = (session: any) => {
   const [messages, setMessages] = useState<IMessage[]>([]);
-  const { setValue } = useFormContext();
+  const { watch, setValue } = useFormContext();
 
+  const isAssistantEnabled = watch('isAssistantEnabled');
+  const isTextToSpeechEnabled = watch('isTextToSpeechEnabled');
+  const model = watch('model');
+  const voice = watch('voice');
   const sentences = useRef<string[]>([]);
   const sentenceIndex = useRef<number>(0);
 
@@ -87,6 +92,14 @@ export const useMessageProcessing = (session: any) => {
     while (!isDone) {
       isDone = await processChunk();
     }
+
+    if (isTextToSpeechEnabled) {
+      await retrieveTextFromSpeech(
+        sentences.current[sentences.current.length - 1],
+        model,
+        voice
+      );
+    }
   };
 
   const processBuffer = async (
@@ -114,6 +127,16 @@ export const useMessageProcessing = (session: any) => {
     const doc = nlp.readDoc(aiResponseText);
     sentences.current = doc.sentences().out();
     const newMessage = addAiMessageToState(aiResponseText, aiResponseId);
+
+    if (isTextToSpeechEnabled) {
+      if (sentences.current.length > sentenceIndex.current + 1) {
+        await retrieveTextFromSpeech(
+          sentences.current[sentenceIndex.current++],
+          model,
+          voice
+        );
+      }
+    }
     return newMessage;
   };
 
@@ -136,8 +159,11 @@ export const useMessageProcessing = (session: any) => {
         return;
       }
 
-      await processStream(response, aiResponseId);
-
+      if (isAssistantEnabled) {
+        await processResponse(response, aiResponseId);
+      } else {
+        await processStream(response, aiResponseId);
+      }
     } catch (error) {
       console.error(error);
     } finally {
@@ -159,6 +185,28 @@ PROMPT:
 ${message}
           `;
     return message;
+  }
+
+  async function processResponse(
+    response: ReadableStreamDefaultReader<Uint8Array> | Response,
+    aiResponseId: string
+  ) {
+    if (!(response instanceof Response)) {
+      console.error('Expected a Response object, received: ', response);
+      return;
+    }
+    try {
+      const contentType = response.headers.get('Content-Type');
+      const data = contentType?.includes('application/json')
+        ? await response.json()
+        : await response.text();
+      addAiMessageToState(data, aiResponseId);
+      if (isTextToSpeechEnabled) {
+        await retrieveTextFromSpeech(data, model, voice);
+      }
+    } catch (error) {
+      console.error('Error processing response: ', error);
+    }
   }
 
   async function processStream(

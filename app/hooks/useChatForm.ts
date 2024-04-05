@@ -5,6 +5,15 @@ interface ChatFormValues {
   description: string;
   transcript: string;
   isLoading: boolean;
+
+  // assistant
+  isAssistantEnabled: boolean;
+
+  // speech
+  model: string;
+  voice: string;
+  isTextToSpeechEnabled: boolean;
+  isSpeechToTextEnabled: boolean;
 }
 
 export const useChatForm = () => {
@@ -13,7 +22,12 @@ export const useChatForm = () => {
       name: '',
       description: '',
       transcript: '',
-      isLoading: false
+      model: '',
+      voice: '',
+      isLoading: false,
+      isAssistantEnabled: false,
+      isTextToSpeechEnabled: false,
+      isSpeechToTextEnabled: false
     },
   });
 

@@ -2,8 +2,10 @@
 
 Titanium is a modern web application built with Next.js, leveraging the latest OpenAI APIs to offer an advanced Generative and Conversational AI experience. It's still pretty much a prototype, but I think it's a good start. Here's a list of some of the features:
 
-- Multi-user Authentication using next-auth, including a custom CredentialProvider for guest accounts.✅
-- Streaming chat - simple chat allowing you to chat with AI in a seamless manner.
+- Multi-user Authentication using next-auth, including a custom CredentialProvider for guest accounts. ✅
+- Streaming chat - simple chat allowing you to chat with AI in a seamless manner. ✅
+- Speech (TTS) ✅ (Supports tts-1 and tts-1-hd and all available voice models)
+- Speech (STT) ✅ (Available via button toggle in the input chat box)
 
 # Libraries
 
@@ -103,11 +105,35 @@ If you set up credentials for GitHub and/or Google, you can use those to log in.
 Keep in mind that upon logout from a guest account, you will lose access to your assistant and all related data.
 ![image-1](https://github.com/athrael-soju/Titanium/assets/25455658/1dedc1e1-6250-4302-b9f3-aca27e88a206)
 
+# Features
+
+To access the features, you can click the hamburger icon at the left of the input box. A menu will pop up, allowing you to make a selection. Available features are:
+
+- Streaming Chat
+- Speech
+
+
 ## Streaming Chat
 
 ![image](https://github.com/athrael-soju/Titanium/assets/25455658/541e228a-d1ec-4a85-b55c-202f55f24a80)
 
 Streaming Chat is the default mode of chat. It's a simple chat interface that allows you to chat with the AI in a seamless manner. All you have to do is type your message and press enter. The AI will respond with a message of its own.
+
+## Speech
+
+![image](https://github.com/athrael-soju/Titanium/assets/25455658/c67a8fa4-f0d4-42ef-8707-773f24028d06)
+
+Speech comes in two parts: Text to Speech (TTS) and Speech to Text (STT). TTS will allow the AI to generate speech from text, while STT will allow the AI to transcribe speech to text. To use TTS, you can select a model and voice from the dropdown menu. To use STT, you can click the microphone icon at the very left of the input box to record a message. Once done, you can click the microphone icon again to stop recording. The AI will then transcribe the message and you can send it to the AI by pressing enter.
+
+# Feature Combinations
+
+Some features can play really well together. For example:
+
+- Speech can be used in conjunction with any other feature, allowing you to speak to the AI instead of typing. This can be especially useful if you're on the go or if you have a disability that makes typing difficult.
+
+# General Notes
+
+- Disabling all features will revert chat to the default streaming chat, without any context or memory.
 
 # Deploy on Vercel
 
